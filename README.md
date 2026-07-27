@@ -408,19 +408,3 @@ Planned enhancements:
 Active development.
 
 KitchenPulse is a portfolio project focused on building real-world restaurant operations intelligence using modern full-stack technologies.
-
----
-
-# 👩‍💻 Author
-
-**Thatikunta Yeshaswini**
-
-Computer Science Engineering Student
-
-GitHub:
-https://github.com/yeshaswini19
-
-
----
-
-⭐ If you find this project interesting, consider giving it a star.
