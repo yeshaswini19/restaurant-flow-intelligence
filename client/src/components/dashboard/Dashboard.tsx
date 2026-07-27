@@ -8,11 +8,14 @@ import RecentOrders from "./RecentOrders";
 import LowStockAlerts from "./LowStockAlerts";
 import AICopilot from "./AICopilot";
 import AIChat from "./AIChat";
+import OrderSimulator from "./OrderSimulator";
 
 export default function Dashboard() {
   return (
     <main className="space-y-10">
       <Hero />
+
+      <OrderSimulator />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <AICopilot />

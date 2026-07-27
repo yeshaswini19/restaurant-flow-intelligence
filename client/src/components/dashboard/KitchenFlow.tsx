@@ -16,69 +16,92 @@ export default function KitchenFlow() {
   const [ingredients, setIngredients] = useState(0);
   const [recipes, setRecipes] = useState(0);
   const [available, setAvailable] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     load();
+
+    const channel = supabase
+      .channel("kitchen-flow-live")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "orders",
+        },
+        load
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "inventory",
+        },
+        load
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   async function load() {
-    const { count: orderCount } = await supabase
-      .from("orders")
-      .select("*", { count: "exact", head: true });
+    setLoading(true);
 
-    const { count: ingredientCount } = await supabase
-      .from("ingredients")
-      .select("*", { count: "exact", head: true });
+    const [{ count: orderCount }, { count: ingredientCount }, { data: recipeData }, { data: inventory }] =
+      await Promise.all([
+        supabase.from("orders").select("*", { count: "exact", head: true }),
+        supabase.from("ingredients").select("*", { count: "exact", head: true }),
+        supabase.from("recipes").select(`
+          quantity_required,
+          ingredients(id),
+          menu_items(id,name)
+        `),
+        supabase
+          .from("inventory")
+          .select("ingredient_id,current_quantity"),
+      ]);
 
-    const { data: recipeData } = await supabase
-      .from("recipes")
-      .select(`
-        quantity_required,
-        ingredients(id),
-        menu_items(name)
-      `);
+    setOrders(orderCount ?? 0);
+    setIngredients(ingredientCount ?? 0);
 
-    const { data: inventory } = await supabase
-      .from("inventory")
-      .select("ingredient_id,current_quantity");
+    const stockMap = new Map<string, number>();
 
-    setOrders(orderCount || 0);
-    setIngredients(ingredientCount || 0);
-
-    const stockMap = new Map();
-
-    inventory?.forEach((i: any) => {
-      stockMap.set(i.ingredient_id, i.current_quantity);
+    inventory?.forEach((item: any) => {
+      stockMap.set(item.ingredient_id, item.current_quantity);
     });
 
-    const grouped: any = {};
+    const grouped: Record<string, any[]> = {};
 
-    recipeData?.forEach((r: any) => {
-      const dish = r.menu_items.name;
+    recipeData?.forEach((recipe: any) => {
+      const dish = recipe.menu_items.name;
 
       if (!grouped[dish]) grouped[dish] = [];
 
       grouped[dish].push({
-        ingredient: r.ingredients.id,
-        required: r.quantity_required,
+        ingredient: recipe.ingredients.id,
+        required: recipe.quantity_required,
       });
     });
 
     let live = 0;
 
     Object.keys(grouped).forEach((dish) => {
-      let ok = true;
-
-      grouped[dish].forEach((i: any) => {
-        if ((stockMap.get(i.ingredient) || 0) < i.required)
-          ok = false;
-      });
+      const ok = grouped[dish].every(
+        (ingredient) =>
+          (stockMap.get(ingredient.ingredient) ?? 0) >=
+          ingredient.required
+      );
 
       if (ok) live++;
     });
 
     setRecipes(Object.keys(grouped).length);
     setAvailable(live);
+    setLoading(false);
   }
 
   const flow = [
@@ -116,70 +139,77 @@ export default function KitchenFlow() {
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-      <div className="flex justify-between items-center mb-10">
+      <div className="mb-10 flex items-center justify-between">
         <div>
-          <p className="uppercase tracking-[0.25em] text-cyan-400 text-sm">
+          <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
             Live Architecture
           </p>
 
-          <h2 className="text-3xl font-bold mt-2">
+          <h2 className="mt-2 text-3xl font-bold">
             Operational Pipeline
           </h2>
 
-          <p className="text-slate-400 mt-2">
-            Real-time restaurant workflow driven by Supabase.
+          <p className="mt-2 text-slate-400">
+            Every order instantly updates inventory, recipe availability,
+            analytics and AI insights.
           </p>
         </div>
 
-        <div className="px-4 py-2 rounded-full bg-green-500/20 text-green-400">
+        <div className="rounded-full bg-green-500/20 px-4 py-2 font-semibold text-green-400">
           ● LIVE
         </div>
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-6 items-center justify-between">
+      {loading ? (
+        <div className="py-16 text-center text-slate-400">
+          Loading live pipeline...
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-between gap-6 xl:flex-row">
+          {flow.map((step, index) => {
+            const Icon = step.icon;
 
-        {flow.map((step, index) => {
-          const Icon = step.icon;
+            return (
+              <div
+                key={step.title}
+                className="flex items-center gap-5"
+              >
+                <div className="min-w-[185px] rounded-2xl border border-white/10 bg-slate-900 p-6 transition hover:border-cyan-500/40">
+                  <div className="mb-5 w-fit rounded-xl bg-cyan-500/10 p-3 text-cyan-400">
+                    <Icon size={24} />
+                  </div>
 
-          return (
-            <div
-              key={step.title}
-              className="flex items-center gap-5"
-            >
-              <div className="rounded-2xl border border-white/10 bg-slate-900 p-6 min-w-[180px]">
+                  <h3 className="text-xl font-bold">
+                    {step.title}
+                  </h3>
 
-                <div className="bg-cyan-500/10 w-fit p-3 rounded-xl text-cyan-400 mb-5">
-                  <Icon size={24} />
+                  <p className="mt-4 text-4xl font-bold text-cyan-400">
+                    {step.value}
+                  </p>
+
+                  <p className="mt-2 text-slate-400">
+                    {step.subtitle}
+                  </p>
                 </div>
 
-                <h3 className="font-bold text-xl">
-                  {step.title}
-                </h3>
-
-                <p className="text-4xl font-bold mt-4 text-cyan-400">
-                  {step.value}
-                </p>
-
-                <p className="text-slate-400 mt-2">
-                  {step.subtitle}
-                </p>
-
+                {index < flow.length - 1 && (
+                  <ArrowRight className="hidden text-cyan-400 xl:block" />
+                )}
               </div>
-
-              {index < flow.length - 1 && (
-                <ArrowRight className="hidden xl:block text-cyan-400" />
-              )}
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="mt-10 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-6">
         <p className="text-slate-300">
-          Every customer order automatically checks recipes, inventory,
-          ingredient dependencies and computes dish availability in real time.
+          <span className="font-semibold text-cyan-400">
+            Live Flow:
+          </span>{" "}
+          Customer Order → Inventory Deduction → Recipe Validation →
+          Dish Availability → Dashboard Update → AI Operational Insights
         </p>
       </div>
     </section>
-  );
+     );
 }

@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { Home } from "lucide-react";
+
 export default function Header() {
   return (
     <header className="flex items-center justify-between p-8 border-b border-white/10">
@@ -18,12 +21,22 @@ export default function Header() {
         </p>
       </div>
 
-      <div className="flex items-center gap-3 rounded-full border border-green-500/30 bg-green-500/10 px-5 py-2">
-        <div className="h-3 w-3 rounded-full bg-green-400 animate-pulse" />
+      <div className="flex items-center gap-4">
+        <Link
+          href="/"
+          className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-slate-300 transition hover:bg-cyan-500/15 hover:text-white"
+        >
+          <Home size={18} />
+          Home
+        </Link>
 
-        <span className="text-green-400 font-semibold tracking-wide">
-          LIVE
-        </span>
+        <div className="flex items-center gap-3 rounded-full border border-green-500/30 bg-green-500/10 px-5 py-2">
+          <div className="h-3 w-3 rounded-full bg-green-400 animate-pulse" />
+
+          <span className="text-green-400 font-semibold tracking-wide">
+            LIVE
+          </span>
+        </div>
       </div>
     </header>
   );

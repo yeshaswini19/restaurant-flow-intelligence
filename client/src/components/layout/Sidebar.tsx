@@ -5,44 +5,81 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Boxes,
+  UtensilsCrossed,
+  ClipboardList,
   BarChart3,
   BrainCircuit,
+  Wrench,
   Settings,
 } from "lucide-react";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/" },
-  { icon: Boxes, label: "Inventory", href: "/inventory" },
-  { icon: BarChart3, label: "Analytics", href: "/analytics" },
-  { icon: BrainCircuit, label: "AI Insights", href: "/ai" },
-  { icon: Settings, label: "Settings", href: "/settings" },
+  {
+    icon: LayoutDashboard,
+    label: "Dashboard",
+    href: "/",
+  },
+  {
+    icon: ClipboardList,
+    label: "Orders",
+    href: "/orders",
+  },
+  {
+    icon: Boxes,
+    label: "Inventory",
+    href: "/inventory",
+  },
+  {
+    icon: UtensilsCrossed,
+    label: "Menu",
+    href: "/menu",
+  },
+  {
+    icon: BarChart3,
+    label: "Analytics",
+    href: "/analytics",
+  },
+  {
+    icon: BrainCircuit,
+    label: "AI Insights",
+    href: "/ai",
+  },
+  {
+    icon: Wrench,
+    label: "Restaurant Setup",
+    href: "/setup",
+  },
+  {
+    icon: Settings,
+    label: "Settings",
+    href: "/settings",
+  },
 ];
 
 export default function Sidebar() {
   return (
-    <aside className="w-72 bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col">
-      {/* Logo */}
-      <div className="px-4 py-5 border-b border-white/10 flex justify-center items-center">
+    <aside className="flex w-72 flex-col border-r border-white/10 bg-white/5 backdrop-blur-xl">
+      <div className="flex items-center justify-center border-b border-white/10 px-4 py-5">
         <Image
-  src="/KP-logo-final.png"
-  alt="KitchenPulse"
-  width={280}
-  height={60}
-  priority
-  className="w-full h-auto object-contain"
-/>
+          src="/KP-logo-final.png"
+          alt="KitchenPulse"
+          width={280}
+          height={60}
+          priority
+          className="h-auto w-full object-contain"
+        />
       </div>
 
-      <nav className="flex-1 px-4 py-6 space-y-2">
+      <nav className="flex-1 space-y-2 px-4 py-6">
         {menuItems.map((item) => (
           <Link
-  href={item.href}
             key={item.label}
-            className="group w-full flex items-center gap-4 rounded-xl px-4 py-3 text-slate-300 hover:bg-cyan-500/15 hover:text-white transition-all duration-300"
+            href={item.href}
+            className="group flex w-full items-center gap-4 rounded-xl px-4 py-3 text-slate-300 transition-all duration-300 hover:bg-cyan-500/15 hover:text-white"
           >
             <item.icon
               size={20}
-              className="group-hover:text-cyan-400 transition"
+              className="transition group-hover:text-cyan-400"
             />
 
             <span>{item.label}</span>
@@ -50,13 +87,13 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="p-5 border-t border-white/10">
-        <div className="rounded-xl bg-cyan-500/10 border border-cyan-500/20 p-4">
+      <div className="border-t border-white/10 p-5">
+        <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/10 p-4">
           <p className="text-xs text-slate-400">
             System Status
           </p>
 
-          <p className="text-cyan-400 font-semibold mt-1">
+          <p className="mt-1 font-semibold text-cyan-400">
             ● All Systems Operational
           </p>
         </div>

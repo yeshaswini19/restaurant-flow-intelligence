@@ -1,4 +1,5 @@
 import "./globals.css";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export const metadata = {
   title: "KitchenPulse",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+  <ScrollToTop />
+  {children}
+</body>
     </html>
   );
 }
