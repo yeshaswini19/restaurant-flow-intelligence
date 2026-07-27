@@ -32,7 +32,10 @@ export default function CustomerPage() {
 
   const fetchMenu = async () => {
     try {
-      const res = await fetch("http://localhost:5000/menu");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/menu`
+      );
+
       const json = await res.json();
       setMenu(json.data || []);
     } finally {
@@ -44,16 +47,19 @@ export default function CustomerPage() {
     try {
       setOrderingId(menuItemId);
 
-      const response = await fetch("http://localhost:5000/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          menuItemId,
-          quantity: 1,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            menuItemId,
+            quantity: 1,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -82,12 +88,12 @@ export default function CustomerPage() {
           </div>
 
           <Link
-  href="/"
-  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-slate-300 transition hover:bg-cyan-500/15 hover:text-white"
->
-  <Home size={18} />
-  Home
-</Link>
+            href="/"
+            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-slate-300 transition hover:bg-cyan-500/15 hover:text-white"
+          >
+            <Home size={18} />
+            Home
+          </Link>
         </div>
       </section>
 
@@ -95,7 +101,9 @@ export default function CustomerPage() {
         <div className="mb-10 grid gap-6 md:grid-cols-3">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <Sparkles className="mb-3 text-cyan-400" />
-            <h3 className="text-xl font-bold">AI Recommendations</h3>
+            <h3 className="text-xl font-bold">
+              AI Recommendations
+            </h3>
             <p className="mt-2 text-slate-400">
               Personalized dishes based on popularity and kitchen efficiency.
             </p>
@@ -103,7 +111,9 @@ export default function CustomerPage() {
 
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <Clock3 className="mb-3 text-cyan-400" />
-            <h3 className="text-xl font-bold">Live Availability</h3>
+            <h3 className="text-xl font-bold">
+              Live Availability
+            </h3>
             <p className="mt-2 text-slate-400">
               Only currently available dishes are shown.
             </p>
@@ -111,26 +121,30 @@ export default function CustomerPage() {
 
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <Star className="mb-3 text-cyan-400" />
-            <h3 className="text-xl font-bold">Fast Ordering</h3>
+            <h3 className="text-xl font-bold">
+              Fast Ordering
+            </h3>
             <p className="mt-2 text-slate-400">
               Place your order instantly.
             </p>
           </div>
         </div>
 
-        <h2 className="mb-6 text-3xl font-bold">Today's Menu</h2>
+        <h2 className="mb-6 text-3xl font-bold">
+          Today's Menu
+        </h2>
 
         {loading ? (
-  <p>Loading menu...</p>
-) : menu.filter((item) => item.is_active).length === 0 ? (
-  <p className="text-slate-400">
-    No dishes are currently available.
-  </p>
-) : (
-  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-    {menu
-      .filter((item) => item.is_active)
-      .map((item) => (
+          <p>Loading menu...</p>
+        ) : menu.filter((item) => item.is_active).length === 0 ? (
+          <p className="text-slate-400">
+            No dishes are currently available.
+          </p>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {menu
+              .filter((item) => item.is_active)
+              .map((item) => (
                 <div
                   key={item.id}
                   className="rounded-2xl border border-white/10 bg-white/5 p-6"
@@ -143,9 +157,13 @@ export default function CustomerPage() {
                     </span>
                   </div>
 
-                  <h3 className="text-2xl font-bold">{item.name}</h3>
+                  <h3 className="text-2xl font-bold">
+                    {item.name}
+                  </h3>
 
-                  <p className="mt-3 text-slate-400">{item.description}</p>
+                  <p className="mt-3 text-slate-400">
+                    {item.description}
+                  </p>
 
                   <div className="mt-5 flex items-center justify-between">
                     <span className="text-2xl font-bold text-cyan-400">
@@ -157,7 +175,9 @@ export default function CustomerPage() {
                       disabled={orderingId === item.id}
                       className="rounded-xl bg-cyan-500 px-5 py-3 font-semibold text-black disabled:opacity-50"
                     >
-                      {orderingId === item.id ? "Ordering..." : "Order"}
+                      {orderingId === item.id
+                        ? "Ordering..."
+                        : "Order"}
                     </button>
                   </div>
                 </div>
