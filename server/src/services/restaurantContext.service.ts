@@ -96,9 +96,7 @@ export async function buildRestaurantContext(): Promise<RestaurantContext> {
     inventory
       ?.filter((item) => item.current_quantity <= 5)
       .map((item) => ({
-        ingredient: Array.isArray(item.ingredient)
-          ? item.ingredient[0]?.name
-          : item.ingredient?.name,
+        ingredient: item.ingredient?.[0]?.name ?? "Unknown",
         quantity: item.current_quantity,
       })) ?? [];
 

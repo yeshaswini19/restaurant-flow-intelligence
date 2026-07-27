@@ -14,10 +14,23 @@ export interface UnavailableDish {
   missingIngredients: MissingIngredient[];
 }
 
+export interface InventoryItem {
+  current_quantity: number;
+  ingredient_id: string;
+  ingredient?: {
+    id: string;
+    name: string;
+  }[] | null;
+}
 export interface RestaurantContext {
   restaurant: string;
+
   totalOrders: number;
+
+  inventory: InventoryItem[];
+
   availableDishes: number;
+
   unavailableDishes: number;
 
   unavailableMenu: string[];
